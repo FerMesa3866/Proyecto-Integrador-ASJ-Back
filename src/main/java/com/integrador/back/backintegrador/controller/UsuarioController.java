@@ -2,6 +2,7 @@ package com.integrador.back.backintegrador.controller;
 
 
 import com.integrador.back.backintegrador.entity.Usuario;
+import com.integrador.back.backintegrador.exception.ErrorProcessException;
 import com.integrador.back.backintegrador.negocio.DTO.UsuarioDTO;
 import com.integrador.back.backintegrador.negocio.DTO.UsuarioLoginDTO;
 import com.integrador.back.backintegrador.negocio.mapper.UsuarioMapper;
@@ -32,30 +33,56 @@ public class UsuarioController {
         this.mapper = mapper;
     }
 
-    @PostMapping(path = "/crear")
-
-    public ResponseEntity<?> crearUsuario(@RequestBody UsuarioDTO usuarioDTO){
-        this.servicio.crearUsuario(mapper.dtoAentidad(usuarioDTO));
+    @PostMapping(path = "/")
+    public ResponseEntity<?> crearUsuario(@RequestBody UsuarioDTO usuarioDTO) throws ErrorProcessException {
+        servicio.crearUsuario(mapper.dtoAentidad(usuarioDTO));
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping(path = "/{nombreUsuario}")
+    public ResponseEntity<?> obtenerUsuario(@PathVariable String nombreUsuario)
+            throws ErrorProcessException {
+        return ResponseEntity.ok(servicio.obtenerUsuario(nombreUsuario));
+    }
 
-    public ResponseEntity<?> obtenerUsuario(@PathVariable String nombreUsuario){
-        try {
+    @PutMapping(path = "/{id}")
+    public ResponseEntity<?> actualizarUsuario(@PathVariable Integer id, @RequestBody UsuarioDTO usuarioDTO) throws ErrorProcessException{
+        Usuario userTmp = mapper.dtoAentidad(usuarioDTO);
+        Usuario updated = servicio.actualizarUsuario(id, userTmp);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(mapper.entidadADto(updated));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> eliminarUsuario(@PathVariable Integer id) throws ErrorProcessException{
+        servicio.eliminarUsuario(id);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> validarUsuario(@RequestBody UsuarioLoginDTO usuarioLoginDTO){
+        if (servicio.validarUsuario(usuarioLoginDTO)){
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Datos mal ingresados");
+        }
+    }
+
+
+    /*-----------------------------Codigo Viejo----------------------------------------*/
+
+    /*
+                        Obtener Usuario
+    try {
             Usuario usuario = servicio.obtenerUsuario(nombreUsuario);
             return ResponseEntity.ok().body(mapper.entidadADto(usuario));
         }
         catch (Exception exception){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("El usuario no existe");
-        }
+        }*/
 
-    }
-
-    @PutMapping(path = "/{id}")
-
-    public ResponseEntity<?> actualizarUsuario(@PathVariable Integer id, @RequestBody UsuarioDTO usuarioDTO){
-        try {
+    /*
+                        Actualizar Usuario
+    try {
             Usuario userTmp = mapper.dtoAentidad(usuarioDTO);
 
             Usuario updated = servicio.actualizarUsuario(id, userTmp);
@@ -63,22 +90,20 @@ public class UsuarioController {
         }
         catch (RuntimeException ex){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado");
-        }
-    }
+        }*/
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> eliminarUsuario(@PathVariable Integer id) {
-        try {
+    /*
+                        Eliminar Usuario
+    try {
             servicio.eliminarUsuario(id);
             return ResponseEntity.status(HttpStatus.ACCEPTED).build();
         } catch (RuntimeException ex) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado");
-        }
-    }
+        }*/
 
-    @PostMapping("/login")
-    public ResponseEntity<?> validarUsuario(@RequestBody UsuarioLoginDTO usuarioLoginDTO){
-        try {
+    /*
+                        Validar Usuario
+    try {
            boolean esValido = servicio.validarUsuario(mapper.usuarioLoginDTOAusuarioEntidad(usuarioLoginDTO));
 
            if(esValido){
@@ -89,8 +114,8 @@ public class UsuarioController {
         }
         catch (RuntimeException ex){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-        }
-    }
+            @RequestBody UsuarioLoginDTO usuarioLoginDTO
+        }*/
 
 
 

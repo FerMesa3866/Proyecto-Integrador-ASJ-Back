@@ -1,6 +1,8 @@
 package com.integrador.back.backintegrador.servicios;
 
 import com.integrador.back.backintegrador.entity.Usuario;
+import com.integrador.back.backintegrador.exception.NotFoundException;
+import com.integrador.back.backintegrador.negocio.DTO.UsuarioLoginDTO;
 import com.integrador.back.backintegrador.repositorio.UsuarioRepositorio;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +29,7 @@ public class UsuarioServicioImpl implements UsuarioServicio{
         if (optionalUsuario.isPresent()){
             return optionalUsuario.get();
         } else {
-            throw new RuntimeException("El usuario con el nombre: "+nombreUsuario+" no existe.");
+            throw new NotFoundException("El usuario con el nombre: "+nombreUsuario+" no existe.");
         }
 
     }
@@ -42,7 +44,7 @@ public class UsuarioServicioImpl implements UsuarioServicio{
             usuarioActualizar = optionalUser.get();
         }
         else {
-            throw new RuntimeException("Usuario con el id: " + id + " no existe");
+            throw new NotFoundException("Usuario con el id: " + id + " no existe");
         }
 
         usuarioActualizar.setNombreUsuario(usuario.getNombreUsuario());
@@ -59,13 +61,13 @@ public class UsuarioServicioImpl implements UsuarioServicio{
         if (optionalUsuario.isPresent()) {
             repo.deleteById(id);
         } else {
-            throw new RuntimeException("Usuario con el id" + id + "no existe");
+            throw new NotFoundException("Usuario con el id" + id + "no existe");
         }
     }
 
     @Override
-    public boolean validarUsuario(Usuario usuario) {
-            return repo.findByNombreUsuarioAndContrasenia(usuario.getNombreUsuario(), usuario.getContrasenia()).isPresent();
+    public boolean validarUsuario(UsuarioLoginDTO usuarioLoginDTO) {
+                return repo.findByNombreUsuarioAndContrasenia(usuarioLoginDTO.getNombre_usuario(), usuarioLoginDTO.getContrasenia()).isPresent();
     }
 
 

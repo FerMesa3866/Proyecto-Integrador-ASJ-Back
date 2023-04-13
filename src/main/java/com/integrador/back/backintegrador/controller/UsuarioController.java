@@ -9,7 +9,8 @@ import com.integrador.back.backintegrador.negocio.mapper.UsuarioMapper;
 import com.integrador.back.backintegrador.servicios.UsuarioServicio;
 
 import io.swagger.annotations.Api;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+/*import org.springframework.beans.factory.annotation.Autowired;*/
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin("http://localhost:4200")
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/usuario")
 
 public class UsuarioController {
@@ -27,11 +29,6 @@ public class UsuarioController {
 
     private final UsuarioMapper mapper;
 
-
-    public UsuarioController(UsuarioServicio servicio, UsuarioMapper mapper){
-        this.servicio = servicio;
-        this.mapper = mapper;
-    }
 
     @PostMapping(path = "/")
     public ResponseEntity<?> crearUsuario(@RequestBody UsuarioDTO usuarioDTO) throws ErrorProcessException {
@@ -47,24 +44,18 @@ public class UsuarioController {
 
     @PutMapping(path = "/{id}")
     public ResponseEntity<?> actualizarUsuario(@PathVariable Integer id, @RequestBody UsuarioDTO usuarioDTO) throws ErrorProcessException{
-        Usuario userTmp = mapper.dtoAentidad(usuarioDTO);
-        Usuario updated = servicio.actualizarUsuario(id, userTmp);
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(mapper.entidadADto(updated));
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(servicio.actualizarUsuario(id, usuarioDTO));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> eliminarUsuario(@PathVariable Integer id) throws ErrorProcessException{
         servicio.eliminarUsuario(id);
-        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body("El usuario se elimino correctamente");
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> validarUsuario(@RequestBody UsuarioLoginDTO usuarioLoginDTO){
-        if (servicio.validarUsuario(usuarioLoginDTO)){
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Datos mal ingresados");
-        }
+    public ResponseEntity<?> validarUsuario(@RequestBody UsuarioLoginDTO usuarioLoginDTO) throws ErrorProcessException{
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(servicio.validarUsuario(usuarioLoginDTO));
     }
 
 
@@ -115,7 +106,14 @@ public class UsuarioController {
         catch (RuntimeException ex){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
             @RequestBody UsuarioLoginDTO usuarioLoginDTO
-        }*/
+        }
+
+        if (servicio.validarUsuario(usuarioLoginDTO)){
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Datos mal ingresados");
+        }
+        */
 
 
 

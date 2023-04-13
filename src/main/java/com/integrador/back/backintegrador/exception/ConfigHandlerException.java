@@ -25,6 +25,12 @@ public class ConfigHandlerException {
                 .body(buildResponse(e.getMessage(), HttpStatus.BAD_REQUEST));
     }
 
+    @ExceptionHandler(UnautorizedException.class)
+    public ResponseEntity<?> handleUnautorized(BadRequestException e){
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(buildResponse(e.getMessage(), HttpStatus.UNAUTHORIZED));
+    }
+
     private ErrorResponse buildResponse(String message, HttpStatus httpStatus) {
         return new ErrorResponse(message, httpStatus.value());
     }

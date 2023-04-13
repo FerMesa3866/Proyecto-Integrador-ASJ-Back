@@ -1,76 +1,115 @@
 package com.integrador.back.backintegrador.servicios;
 
 import com.integrador.back.backintegrador.entity.Usuario;
+import com.integrador.back.backintegrador.exception.ErrorProcessException;
 import com.integrador.back.backintegrador.exception.NotFoundException;
+import com.integrador.back.backintegrador.exception.UnautorizedException;
+import com.integrador.back.backintegrador.negocio.DTO.UsuarioDTO;
 import com.integrador.back.backintegrador.negocio.DTO.UsuarioLoginDTO;
+import com.integrador.back.backintegrador.negocio.mapper.UsuarioMapper;
 import com.integrador.back.backintegrador.repositorio.UsuarioRepositorio;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+@RequiredArgsConstructor
 @Service
 public class UsuarioServicioImpl implements UsuarioServicio{
 
     private final UsuarioRepositorio repo;
 
-    public UsuarioServicioImpl(UsuarioRepositorio repo){
-        this.repo = repo;
-    }
+    private final UsuarioMapper mapper;
 
     @Override
-    public void crearUsuario (Usuario usuario){
+    public void crearUsuario (Usuario usuario) throws ErrorProcessException{
        repo.save(usuario);
     }
 
     @Override
-    public Usuario obtenerUsuario (String nombreUsuario){
-        Optional<Usuario> optionalUsuario = repo.findByNombreUsuario(nombreUsuario);
+    public Usuario obtenerUsuario (String nombreUsuario) throws ErrorProcessException{
+        Usuario usuarioAobtener = repo
+                .findByNombreUsuario(nombreUsuario)
+                .orElseThrow(() -> new NotFoundException("El usuario con el nombre: "+nombreUsuario+" no existe."));
+        return usuarioAobtener;
+    }
+
+    @Override
+    public Usuario actualizarUsuario (Integer id, UsuarioDTO usuarioDTO) throws ErrorProcessException {
+
+        Usuario usuarioActualizar = repo
+                .findById(id)
+                .orElseThrow(() -> new NotFoundException("Usuario con el id: " + id + " no existe"));
+
+        Usuario userTmp = mapper.dtoAentidad(usuarioDTO);
+        try {
+            usuarioActualizar.setNombreUsuario(userTmp.getNombreUsuario());
+            usuarioActualizar.setEmail(userTmp.getEmail());
+            usuarioActualizar.setContrasenia(userTmp.getContrasenia());
+
+            return repo.save(usuarioActualizar);
+        } catch (RuntimeException error){
+            throw new ErrorProcessException(error.getMessage());
+        }
+
+    }
+
+    @Override
+    public void eliminarUsuario(Integer id) throws ErrorProcessException {
+        repo.findById(id)
+                .orElseThrow(() -> new NotFoundException("Usuario con el id " + id + " no existe"));
+        try {
+            repo.deleteById(id);
+        } catch (RuntimeException error){
+            throw new ErrorProcessException(error.getMessage());
+        }
+    }
+
+    @Override
+    public boolean validarUsuario(UsuarioLoginDTO usuarioLoginDTO) throws ErrorProcessException{
+        System.out.println(usuarioLoginDTO.getNombre_usuario()+" "+usuarioLoginDTO.getContrasenia());
+                repo.findByNombreUsuarioAndContrasenia(usuarioLoginDTO.getNombre_usuario(), usuarioLoginDTO.getContrasenia()).orElseThrow(() -> new UnautorizedException("Datos no validos"));
+
+                try {
+                    return repo.findByNombreUsuarioAndContrasenia(usuarioLoginDTO.getNombre_usuario(), usuarioLoginDTO.getContrasenia()).isPresent();
+                } catch (RuntimeException error){
+                    throw new ErrorProcessException(error.getMessage());
+                }
+    }
+
+
+
+/*--------------------------------Codigo Viejo---------------------------------*/
+
+    /*          Obtener Usuario
+
+    Optional<Usuario> optionalUsuario = repo.findByNombreUsuario(nombreUsuario);
         System.out.println(optionalUsuario);
         if (optionalUsuario.isPresent()){
             return optionalUsuario.get();
         } else {
             throw new NotFoundException("El usuario con el nombre: "+nombreUsuario+" no existe.");
-        }
+        }*/
 
-    }
+    /*          Actualizar Usuario
 
-    @Override
-    public Usuario actualizarUsuario (Integer id, Usuario usuario){
-
-        Usuario usuarioActualizar;
-
-        Optional<Usuario> optionalUser = repo.findById(id);
+    Optional<Usuario> optionalUser = repo.findById(id);
         if (optionalUser.isPresent()) {
             usuarioActualizar = optionalUser.get();
         }
         else {
             throw new NotFoundException("Usuario con el id: " + id + " no existe");
-        }
+        }*/
 
-        usuarioActualizar.setNombreUsuario(usuario.getNombreUsuario());
-        usuarioActualizar.setEmail(usuario.getEmail());
-        usuarioActualizar.setContrasenia(usuario.getContrasenia());
+    /*          Eliminar Usuario
 
-        return repo.save(usuarioActualizar);
-    }
-
-    @Override
-    public void eliminarUsuario(Integer id) {
-        Optional<Usuario> optionalUsuario = repo.findById(id);
+    Optional<Usuario> optionalUsuario = repo.findById(id);
 
         if (optionalUsuario.isPresent()) {
             repo.deleteById(id);
         } else {
             throw new NotFoundException("Usuario con el id" + id + "no existe");
-        }
-    }
-
-    @Override
-    public boolean validarUsuario(UsuarioLoginDTO usuarioLoginDTO) {
-                return repo.findByNombreUsuarioAndContrasenia(usuarioLoginDTO.getNombre_usuario(), usuarioLoginDTO.getContrasenia()).isPresent();
-    }
-
-
+        }*/
 
 
 }

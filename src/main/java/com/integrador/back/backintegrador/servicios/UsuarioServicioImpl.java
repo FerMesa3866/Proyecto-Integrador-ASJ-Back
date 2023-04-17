@@ -68,48 +68,15 @@ public class UsuarioServicioImpl implements UsuarioServicio{
     @Override
     public boolean validarUsuario(UsuarioLoginDTO usuarioLoginDTO) throws ErrorProcessException{
         System.out.println(usuarioLoginDTO.getNombre_usuario()+" "+usuarioLoginDTO.getContrasenia());
-                repo.findByNombreUsuarioAndContrasenia(usuarioLoginDTO.getNombre_usuario(), usuarioLoginDTO.getContrasenia()).orElseThrow(() -> new UnautorizedException("Datos no validos"));
 
-                try {
-                    return repo.findByNombreUsuarioAndContrasenia(usuarioLoginDTO.getNombre_usuario(), usuarioLoginDTO.getContrasenia()).isPresent();
-                } catch (RuntimeException error){
-                    throw new ErrorProcessException(error.getMessage());
+            Optional<Usuario> optional = repo.findByNombreUsuarioAndContrasenia(usuarioLoginDTO.getNombre_usuario(), usuarioLoginDTO.getContrasenia());
+            if (optional.isPresent()){
+                if (optional.get().getContrasenia().equals(usuarioLoginDTO.getContrasenia())){
+                    return true;
                 }
+            }
+            return false;
+
     }
-
-
-
-/*--------------------------------Codigo Viejo---------------------------------*/
-
-    /*          Obtener Usuario
-
-    Optional<Usuario> optionalUsuario = repo.findByNombreUsuario(nombreUsuario);
-        System.out.println(optionalUsuario);
-        if (optionalUsuario.isPresent()){
-            return optionalUsuario.get();
-        } else {
-            throw new NotFoundException("El usuario con el nombre: "+nombreUsuario+" no existe.");
-        }*/
-
-    /*          Actualizar Usuario
-
-    Optional<Usuario> optionalUser = repo.findById(id);
-        if (optionalUser.isPresent()) {
-            usuarioActualizar = optionalUser.get();
-        }
-        else {
-            throw new NotFoundException("Usuario con el id: " + id + " no existe");
-        }*/
-
-    /*          Eliminar Usuario
-
-    Optional<Usuario> optionalUsuario = repo.findById(id);
-
-        if (optionalUsuario.isPresent()) {
-            repo.deleteById(id);
-        } else {
-            throw new NotFoundException("Usuario con el id" + id + "no existe");
-        }*/
-
 
 }

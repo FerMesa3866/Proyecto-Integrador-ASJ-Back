@@ -55,76 +55,7 @@ public class UsuarioController {
 
     @PostMapping("/login")
     public ResponseEntity<?> validarUsuario(@RequestBody UsuarioLoginDTO usuarioLoginDTO) throws ErrorProcessException{
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(servicio.validarUsuario(usuarioLoginDTO));
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(servicio.validarUsuario(usuarioLoginDTO));
     }
-
-
-    /*-----------------------------Codigo Viejo----------------------------------------*/
-
-    /*
-                        Obtener Usuario
-    try {
-            Usuario usuario = servicio.obtenerUsuario(nombreUsuario);
-            return ResponseEntity.ok().body(mapper.entidadADto(usuario));
-        }
-        catch (Exception exception){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("El usuario no existe");
-        }*/
-
-    /*
-                        Actualizar Usuario
-    try {
-            Usuario userTmp = mapper.dtoAentidad(usuarioDTO);
-
-            Usuario updated = servicio.actualizarUsuario(id, userTmp);
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body(mapper.entidadADto(updated));
-        }
-        catch (RuntimeException ex){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado");
-        }*/
-
-    /*
-                        Eliminar Usuario
-    try {
-            servicio.eliminarUsuario(id);
-            return ResponseEntity.status(HttpStatus.ACCEPTED).build();
-        } catch (RuntimeException ex) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado");
-        }*/
-
-    /*
-                        Validar Usuario
-    try {
-           boolean esValido = servicio.validarUsuario(mapper.usuarioLoginDTOAusuarioEntidad(usuarioLoginDTO));
-
-           if(esValido){
-               return ResponseEntity.status(HttpStatus.ACCEPTED).body(usuarioLoginDTO);
-           } else {
-               throw new RuntimeException("Datos mal ingresados");
-           }
-        }
-        catch (RuntimeException ex){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-            @RequestBody UsuarioLoginDTO usuarioLoginDTO
-        }
-
-        if (servicio.validarUsuario(usuarioLoginDTO)){
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Datos mal ingresados");
-        }
-        */
-
-
-
-
-
-//    @DeleteMapping("/delete/{nombreUsuario}")
-//    public ResponseEntity<String> delete(@PathVariable String nombreUsuario) throws Exception {
-//        serviceUsuario.deleteByUsuario(nombreUsuario);
-//        return ResponseEntity.ok("Usuario con ID: " + nombreUsuario + " eliminado");
-//    }
-
-
 
 }
